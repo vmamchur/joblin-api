@@ -14,8 +14,12 @@ import (
 	"github.com/vmamchur/vacancy-board/internal/repository"
 )
 
+const baseUrl = "https://djinni.co"
+
 type DjinniScraper struct {
 	vacancyRepository repository.VacancyRepository
+	email             string
+	password          string
 }
 
 func (d DjinniScraper) Scrape() error {
@@ -26,10 +30,10 @@ func (d DjinniScraper) Scrape() error {
 	defer cancel()
 
 	err := chromedp.Run(ctx,
-		chromedp.Navigate("https://djinni.co/login"),
+		chromedp.Navigate(baseUrl+"/login"),
 		chromedp.WaitVisible("form#signup", chromedp.ByQuery),
-		chromedp.SendKeys(`form#signup input[name="email"]`, "nerddcity@gmail.com", chromedp.ByQuery),
-		chromedp.SendKeys(`form#signup input[name="password"]`, "11121314", chromedp.ByQuery),
+		chromedp.SendKeys(`form#signup input[name="email"]`, d.email, chromedp.ByQuery),
+		chromedp.SendKeys(`form#signup input[name="password"]`, d.password, chromedp.ByQuery),
 		chromedp.Click(`form#signup button[type="submit"]`, chromedp.ByQuery),
 		chromedp.Sleep(2*time.Second),
 	)
@@ -38,13 +42,13 @@ func (d DjinniScraper) Scrape() error {
 	}
 
 	page := 1
-outer:
+
 	for {
 		log.Printf("Navigating to page %d...", page)
 
 		var jobNodes []*cdp.Node
 		err = chromedp.Run(ctx,
-			chromedp.Navigate(fmt.Sprintf("https://djinni.co/jobs/?primary_keyword=fullstack&page=%d", page)),
+			chromedp.Navigate(fmt.Sprintf(baseUrl+"/jobs/?primary_keyword=fullstack&page=%d", page)),
 			chromedp.WaitVisible("li[id^=job-item-]", chromedp.ByQuery),
 			chromedp.Nodes("li[id^=job-item-]", &jobNodes, chromedp.ByQueryAll),
 		)
@@ -67,7 +71,7 @@ outer:
 				continue
 			}
 
-			fullUrl := "https://djinni.co" + url
+			fullUrl := baseUrl + url
 			log.Printf("Processing: \"%s\" at \"%s\" (%s)", title, companyName, fullUrl)
 
 			_, err = d.vacancyRepository.Create(ctx, model.CreateVacancyDTO{
@@ -79,8 +83,8 @@ outer:
 				Url: fullUrl,
 			})
 			if err != nil {
-				log.Printf("Stopping: vacancy already exists — \"%s\" (%s)", title, fullUrl)
-				break outer
+				log.Printf("Skipping creation: vacancy already exists — \"%s\" (%s)", title, fullUrl)
+				continue
 			}
 
 			log.Printf("Saved: \"%s\" (%s)", title, fullUrl)

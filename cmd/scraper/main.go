@@ -32,7 +32,7 @@ func main() {
 	q := generated.New(db)
 
 	vacancyRepository := repository.NewVacancyRepository(q)
-	scraper := scraper.NewScraper(vacancyRepository)
+	scraper := scraper.NewScraper(vacancyRepository, cfg.Scraper.Djinni.Email, cfg.Scraper.Djinni.Password)
 
 	log.Println("Scraper service running...")
 	scraper.Run()

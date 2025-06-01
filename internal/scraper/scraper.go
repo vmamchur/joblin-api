@@ -2,7 +2,6 @@ package scraper
 
 import (
 	"log"
-	"time"
 
 	"github.com/vmamchur/vacancy-board/internal/repository"
 )
@@ -16,23 +15,16 @@ type ScraperService struct {
 	scrapers          []Scraper
 }
 
-func NewScraper(vacancyRepository repository.VacancyRepository) *ScraperService {
+func NewScraper(vacancyRepository repository.VacancyRepository, djEmail string, djPassword string) *ScraperService {
 	return &ScraperService{
 		vacancyRepository: vacancyRepository,
 		scrapers: []Scraper{
-			DjinniScraper{vacancyRepository: vacancyRepository},
+			DjinniScraper{vacancyRepository: vacancyRepository, email: djEmail, password: djPassword},
 		},
 	}
 }
 
 func (s *ScraperService) Run() {
-	ticker := time.NewTicker(1 * time.Hour)
-	defer ticker.Stop()
-
-	s.scrapeAll()
-}
-
-func (s *ScraperService) scrapeAll() {
 	for _, scr := range s.scrapers {
 		err := scr.Scrape()
 		if err != nil {

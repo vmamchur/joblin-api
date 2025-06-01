@@ -39,8 +39,12 @@ func main() {
 	authService := service.NewAuthService(userRepository, refreshTokenRepository, cfg.AppSecret)
 	authHandler := handler.NewAuthHandler(authService)
 
-	router := route.NewRouter(authHandler, cfg.AppSecret)
+	vacancyRepository := repository.NewVacancyRepository(q)
+	vacancyService := service.NewVacancyService(vacancyRepository)
+	vacancyHandler := handler.NewVacancyHandler(vacancyService)
 
-	log.Printf("Server listening on: %s", cfg.AppPort)
+	router := route.NewRouter(cfg.AppSecret, authHandler, vacancyHandler)
+
 	log.Fatal(http.ListenAndServe(":"+cfg.AppPort, router))
+	log.Printf("Server listening on: %s", cfg.AppPort)
 }

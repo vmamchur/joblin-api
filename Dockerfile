@@ -9,7 +9,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main cmd/api/main.go
+RUN go build -o main cmd/main.go
 
 FROM alpine:3.20.1 AS base
 WORKDIR /app

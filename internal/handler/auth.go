@@ -75,6 +75,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	err := h.authService.RevokeRefreshToken(r.Context(), dto.RefreshToken)
 	if err != nil {
 		httputil.RespondWithError(w, http.StatusUnauthorized, err.Error(), err)
+		return
 	}
 
 	httputil.RespondWithJSON(w, http.StatusNoContent, nil)
@@ -90,6 +91,7 @@ func (h *AuthHandler) GetMe(w http.ResponseWriter, r *http.Request) {
 	user, err := h.authService.GetMe(r.Context(), userID)
 	if err != nil {
 		httputil.RespondWithError(w, http.StatusUnauthorized, err.Error(), err)
+		return
 	}
 
 	httputil.RespondWithJSON(w, http.StatusOK, user)

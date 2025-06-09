@@ -1,7 +1,11 @@
 build:
 	docker compose build 
 
-run:	build
+network:
+	docker network inspect primary >/dev/null 2>&1 || \
+	docker network create primary
+
+run:	network build
 	docker compose up
 
 migrate-up:

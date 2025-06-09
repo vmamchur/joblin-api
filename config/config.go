@@ -10,8 +10,7 @@ type Config struct {
 	AppPort   string
 	AppSecret string
 
-	DB      DBConfig
-	Scraper ScraperConfig
+	DB DBConfig
 }
 
 type DBConfig struct {
@@ -21,15 +20,6 @@ type DBConfig struct {
 	Password string
 	Name     string
 	SSLMode  string
-}
-
-type ScraperConfig struct {
-	Djinni DjinniConfig
-}
-
-type DjinniConfig struct {
-	Email    string
-	Password string
 }
 
 const (
@@ -48,12 +38,6 @@ func Load() Config {
 			Password: mustEnv("DB_PASSWORD"),
 			Name:     mustEnv("DB_NAME"),
 			SSLMode:  getEnv("DB_SSLMODE", "disable"),
-		},
-		Scraper: ScraperConfig{
-			Djinni: DjinniConfig{
-				Email:    mustEnv("DJINNI_EMAIL"),
-				Password: mustEnv("DJINNI_PASSWORD"),
-			},
 		},
 	}
 }

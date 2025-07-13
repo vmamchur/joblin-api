@@ -11,6 +11,15 @@ VALUES (
 ON CONFLICT (url) DO NOTHING
 RETURNING *;
 
--- name: GetAllVacancies :many
-SELECT * FROM vacancies;
+-- name: GetVacancies :many
+SELECT *
+FROM vacancies
+WHERE (
+	$1::text IS NULL
+	OR company_name ILIKE '%' || $1::text || '%'
+	OR title ILIKE '%' || $1::text || '%'
+)
+ORDER BY created_at DESC
+LIMIT $2
+OFFSET $3;
 

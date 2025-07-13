@@ -20,3 +20,9 @@ type CreateVacancyDTO struct {
 	CompanyName string `json:"company_name"`
 	Url         string `json:"url"`
 }
+
+type GetVacanciesFilter struct {
+	Search string
+	Limit  int
+	Offset int
+}

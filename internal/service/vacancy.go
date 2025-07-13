@@ -17,8 +17,8 @@ func NewVacancyService(
 	return &VacancyService{vacancyRepository: vacancyRepository}
 }
 
-func (s *VacancyService) GetAll(ctx context.Context) ([]model.Vacancy, error) {
-	vacancies, err := s.vacancyRepository.GetAll(ctx)
+func (s *VacancyService) GetAll(ctx context.Context, filter model.GetVacanciesFilter) ([]model.Vacancy, error) {
+	vacancies, err := s.vacancyRepository.Get(ctx, filter)
 	if err != nil {
 		return nil, err
 	}

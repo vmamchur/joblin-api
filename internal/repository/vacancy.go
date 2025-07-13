@@ -9,7 +9,7 @@ import (
 
 type VacancyRepository interface {
 	Create(ctx context.Context, dto model.CreateVacancyDTO) (*model.Vacancy, error)
-	GetAll(ctx context.Context) ([]model.Vacancy, error)
+	Get(ctx context.Context, filter model.GetVacanciesFilter) ([]model.Vacancy, error)
 }
 
 type vacancyRepository struct {
@@ -33,8 +33,12 @@ func (r *vacancyRepository) Create(ctx context.Context, dto model.CreateVacancyD
 	return toModelVacancy(dbVacancy), nil
 }
 
-func (r *vacancyRepository) GetAll(ctx context.Context) ([]model.Vacancy, error) {
-	dbVacancies, err := r.q.GetAllVacancies(ctx)
+func (r *vacancyRepository) Get(ctx context.Context, filter model.GetVacanciesFilter) ([]model.Vacancy, error) {
+	dbVacancies, err := r.q.GetVacancies(ctx, generated.GetVacanciesParams{
+		Column1: filter.Search,
+		Limit:   int32(filter.Limit),
+		Offset:  int32(filter.Offset),
+	})
 	if err != nil {
 		return nil, err
 	}

@@ -7,5 +7,5 @@ import (
 )
 
 func RegisterVacancyRoutes(mux *http.ServeMux, vacancyHandler *handler.VacancyHandler) {
-	mux.Handle("GET /vacancies", http.HandlerFunc(vacancyHandler.GetAll))
+	mux.Handle("GET /vacancies", http.HandlerFunc(vacancyHandler.Get))
 }

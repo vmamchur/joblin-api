@@ -43,12 +43,27 @@ func (q *Queries) CreateVacancy(ctx context.Context, arg CreateVacancyParams) (V
 	return i, err
 }
 
-const getAllVacancies = `-- name: GetAllVacancies :many
-SELECT id, created_at, updated_at, title, company_name, url FROM vacancies
+const getVacancies = `-- name: GetVacancies :many
+SELECT id, created_at, updated_at, title, company_name, url
+FROM vacancies
+WHERE (
+	$1::text IS NULL
+	OR company_name ILIKE '%' || $1::text || '%'
+	OR title ILIKE '%' || $1::text || '%'
+)
+ORDER BY created_at DESC
+LIMIT $2
+OFFSET $3
 `
 
-func (q *Queries) GetAllVacancies(ctx context.Context) ([]Vacancy, error) {
-	rows, err := q.db.QueryContext(ctx, getAllVacancies)
+type GetVacanciesParams struct {
+	Column1 string `json:"column_1"`
+	Limit   int32  `json:"limit"`
+	Offset  int32  `json:"offset"`
+}
+
+func (q *Queries) GetVacancies(ctx context.Context, arg GetVacanciesParams) ([]Vacancy, error) {
+	rows, err := q.db.QueryContext(ctx, getVacancies, arg.Column1, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
